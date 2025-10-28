@@ -157,7 +157,7 @@
             <input type="text" id="celular" name="celular" placeholder="Selecione um país..." required>
         </div>
 
-        <div>
+        <div hidden>
             <label for="renda_familiar">Qual é a sua renda familiar mensal? (Média)</label>
             <select id="renda_familiar" name="renda_familiar" required>
                 <option value="">Selecione a faixa de renda...</option>
@@ -294,7 +294,7 @@
 
         // Atualiza a máscara do telefone
         function updatePhoneMask(iso2) {
-            // Destrói a máscara antiga, se existir
+            // Destrói a máscara antiga caso exista
             if (phoneMask) {
                 phoneMask.destroy();
                 phoneMask = null;
@@ -327,7 +327,7 @@
                 // ...e atualiza a máscara do telefone
                 updatePhoneMask(paisIso2);
             } else {
-                // Limpa/reseta se o usuário selecionar "Selecione um país"
+                // reseta se o usuário selecionar "Selecione um país"
                 estadoSelect.innerHTML = '<option value="">Selecione um país primeiro...</option>';
                 estadoSelect.disabled = true;
                 if (phoneMask) phoneMask.destroy();
@@ -345,7 +345,7 @@
             const data = Object.fromEntries(formData.entries());
 
             // **IMPORTANTE**: Pega o valor SEM máscara e adiciona o "+"
-            // Isso garante o formato E.164 (ex: +5585999017780) para o seu banco
+            //  Formato banco E.164 (ex: +5585999017780) 
             if (phoneMask) {
                  data.celular = '+' + phoneMask.unmaskedValue;
             } else {
