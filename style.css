@@ -1,0 +1,89 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+form {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+h2 {
+    text-align: center;
+    margin-top: 0;
+    /* Cor AZUL da sua logo */
+    color: #005EB8; 
+}
+
+div {
+    margin-bottom: 1.25rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+/* Cor AMARELA da logo no focus */
+input:focus, select:focus {
+    border-color: #FFD700;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    outline: none;
+}
+
+/* Desabilitar o select de estado até um país ser escolhido */
+select:disabled {
+    background-color: #f4f4f9;
+}
+
+button {
+    width: 100%;
+    padding: 0.85rem;
+    /* Cor VERDE da sua logo */
+    background-color: #009444; 
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    /* Verde um pouco mais escuro */
+    background-color: #007a3a;
+}
+
+#feedback {
+    margin-top: 1rem;
+    font-weight: 600;
+    text-align: center;
+}
+.success { color: green; }
+.error { color: red; }
