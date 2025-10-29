@@ -167,10 +167,12 @@ form.addEventListener('submit', async (event) => {
     const data = Object.fromEntries(formData.entries());
 
     //  Pega o valor SEM máscara e adiciona o "+"
-    if (phoneMask) {
-         data.celular = '+' + phoneMask.unmaskedValue;
+    if (phoneMask && phoneMask.value) {
+         // Pega o valor formatado (ex: "+55 (85) 99901-7780")
+         // e remove os caracteres de formatação 
+         data.celular = phoneMask.value.replace(/[ \(\)\-]/g, '');
     } else {
-        // Fallback caso a máscara falhe
+        // Fallback 
         data.celular = data.celular.replace(/[\s\(\)\-]/g, ''); 
     }
     
