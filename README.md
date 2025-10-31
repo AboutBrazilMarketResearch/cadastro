@@ -65,8 +65,6 @@ A função `cadastrar-painelista` (em `supabase/functions/cadastrar-painelista/i
   - `N8N_WEBHOOK_URL` quando `mode = production`
 - Retorna o JSON de sucesso do n8n ou mensagem de erro (status 400).
 
-Importante: em `supabase/config.toml`, `verify_jwt = true`, então a função exige um JWT válido no header `Authorization` (no front usamos o `anon key`).
-
 ---
 
 ## Banco de dados  (Supabase)
