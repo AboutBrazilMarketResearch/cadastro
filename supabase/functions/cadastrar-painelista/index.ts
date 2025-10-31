@@ -13,26 +13,24 @@ serve(async (req) => {
 
   try {
     // 1. Pega os dados que o JS enviou
-    // AGORA, esperamos um 'mode' e um 'body'
     const { mode, body: dadosDoFormulario } = await req.json()
 
     // 2. Pega as DUAS URLs dos segredos
     const prodUrl = Deno.env.get('N8N_WEBHOOK_URL') // A que você já tinha
     const testUrl = Deno.env.get('N8N_TEST_URL')    // A nova que criamos
 
-    // 3. DECIDE qual URL usar
-    // Se o 'mode' enviado for "test", usa a testUrl. Senão, usa a prodUrl.
+    // 3. Se usa text ou prod 
     const n8nUrl = (mode === 'test') ? testUrl : prodUrl;
 
     if (!n8nUrl) {
       throw new Error("URL do n8n não configurada para o modo: " + mode)
     }
 
-    // 4. Repassa os dados para o n8n (mesma lógica de antes)
+    // 4. Repassa os dados para o n8n 
     const n8nResponse = await fetch(n8nUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dadosDoFormulario), // Enviamos apenas o 'body'
+      body: JSON.stringify(dadosDoFormulario), 
     })
 
     if (!n8nResponse.ok) {

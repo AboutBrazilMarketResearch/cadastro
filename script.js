@@ -1,16 +1,13 @@
-// ---------------------------------------------------------------
-// 1. CONFIGURAÇÃO (PREENCHA AQUI!)
-// ---------------------------------------------------------------
 
-// URL e Chave ANON Supabase (JÁ PREENCHIDO POR VOCÊ)
+// URL e Chave ANON Supabase 
 const SUPABASE_URL = "https://mlhdtsjdhmmaiveltojv.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1saGR0c2pkaG1tYWl2ZWx0b2p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MTI5NzMsImV4cCI6MjA3NTA4ODk3M30.ruk8TVAvqwIs-bHCgcbw2S2q_wLtRG3dP9DEEDEQVkM";
 
 // URL para onde o usuário será enviado após o sucesso
 const URL_REDIRECIONAMENTO = "https://conectatribo.com.br/t/lOlVjW";
 
-// ★★★ NOVO: MODO DE TESTE ★★★
-// Coloque 'true' para enviar ao seu n8n de teste.
+
+// Coloque 'true' para enviar ao  n8n de teste.
 // Coloque 'false' para enviar ao n8n de produção.
 const MODO_DE_TESTE = false; 
 
@@ -67,7 +64,7 @@ const translations = {
     }
 };
 
-// --- Mapeamento de máscaras de telefone (DOS SEUS PAÍSES) ---
+// --- Mapeamento de máscaras de telefone Países ---
 const maskMap = {
     'AR': { mask: '+54 000 000-0000', placeholder: '+54 XXX XXX-XXXX' }, 
     'BO': { mask: '+591 0 000-0000', placeholder: '+591 X XXX-XXXX' },    
@@ -91,7 +88,7 @@ const maskMap = {
     'DEFAULT': { mask: '+000000000000000', placeholder: 'Número com cód. país' }
 };
 
-// ★★★ CORREÇÃO 1: MAPA DE COMPRIMENTO (para o bug do .isComplete) ★★★
+
 const lengthMap = {
     'AR': 10, 'BO': 8, 'BR': 11, 'CL': 9, 'CO': 10, 'EC': 9, 'PY': 9,
     'PE': 9, 'UY': 8, 'VE': 10, 'CR': 8, 'CU': 8, 'DO': 10, 'SV': 8,
@@ -139,7 +136,7 @@ const celularInput = document.getElementById('celular');
 let phoneMask = null; 
 
 // ---------------------------------------------------------------
-// 4. FUNÇÕES DE DADOS (BUSCA NO SUPABASE)
+// 4. FUNÇÕES DE DADOS 
 // ---------------------------------------------------------------
 
 async function fetchPaises() {
@@ -178,7 +175,7 @@ async function fetchEstados(paisId) {
     estadoSelect.disabled = false;
 }
 
-// (Esta função assume que você corrigiu seu HTML para 'id_genero' e limpou as options)
+// 
 async function fetchGeneros() {
      const { data, error } = await supabase.from('genero').select('id_genero, escolha_genero').order('id_genero');
     if (error) { 
@@ -210,10 +207,9 @@ function updatePhoneMask(iso2) {
 // 6. EVENT LISTENERS
 // ---------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
-    // ★★★ CORREÇÃO: As funções de tradução e gênero estavam comentadas ★★★
+   
     setLanguage(); 
     fetchPaises();   
-    // (Seu HTML usa 'name="genero"' com options estáticas, então NÃO buscamos 'fetchGeneros()')
     
     // Força o bloqueio do celular ao carregar
     celularInput.disabled = true;
@@ -227,13 +223,13 @@ paisSelect.addEventListener('change', (event) => {
     if (paisId) {
         fetchEstados(paisId);
         updatePhoneMask(paisIso2);
-        celularInput.disabled = false; // Habilita o campo de celular
+        celularInput.disabled = false; 
     } else {
         estadoSelect.innerHTML = `<option value="">${dict.optSelecionePais}</option>`;
         estadoSelect.disabled = true;
         if (phoneMask) phoneMask.destroy();
         celularInput.placeholder = dict.optSelecionePais;
-        celularInput.disabled = true; // Desabilita o campo de celular
+        celularInput.disabled = true; 
     }
 });
 
@@ -252,14 +248,13 @@ form.addEventListener('submit', async (event) => {
         return; 
     }
     
-    // --- ★★★ CORREÇÃO 2: VALIDAÇÃO DE CELULAR (POR COMPRIMENTO) ★★★ ---
     // Pega o 'iso2' do país que o usuário selecionou
     const paisIso2 = paisSelect.options[paisSelect.selectedIndex].dataset.iso2;
-    // Pega o comprimento esperado do nosso 'lengthMap'
+    // Pega o comprimento esperado do 'lengthMap'
     const expectedLength = lengthMap[paisIso2] || lengthMap['DEFAULT'];
     
     if (!phoneMask || phoneMask.unmaskedValue.length !== expectedLength) {
-        // Se a máscara não existir OU o número de dígitos for DIFERENTE do esperado
+        
         feedback.textContent = dict.feedbackErroCelularInvalido;
         feedback.className = 'error';
         return; // Impede o envio
@@ -271,7 +266,7 @@ form.addEventListener('submit', async (event) => {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     
-    // --- ★★★ CORREÇÃO 3: FORMATO DO TELEFONE (FORMATO E.164) ★★★ ---
+    // 
     let celular_e164 = "";
     if (phoneMask && phoneMask.value) {
          // Pega o valor formatado (ex: "+55 (85) 9...-....") e limpa
@@ -281,7 +276,6 @@ form.addEventListener('submit', async (event) => {
     }
     data.celular = celular_e164;
    
-    // ★★★ CORREÇÃO: O seu HTML usa name="genero", o n8n espera "id_genero" ★★★
     if (data.genero) {
         data.id_genero = data.genero;
         delete data.genero; // Limpa o campo antigo
@@ -309,7 +303,7 @@ form.addEventListener('submit', async (event) => {
     result = { mensagem: "Erro desconhecido ao processar resposta." };
   }
 
-  // Caso erro vindo do n8n (ex: 409)
+  // Caso erro vindo do n8n 
   if (!response.ok) {
     feedback.textContent = result.mensagem || "Erro ao processar cadastro.";
     feedback.className = "error";
