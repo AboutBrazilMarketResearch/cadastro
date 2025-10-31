@@ -1,4 +1,4 @@
-# About Pesquisas Pagas — Formulário de Cadastro
+# About Pesquisas Pagas — Formulário de Cadastro Pesquisas Pagas
 
 Formulário web simples e responsivo para cadastrar painelistas, com:
 - Autocomplete de País/Estado a partir do banco Supabase
@@ -7,7 +7,7 @@ Formulário web simples e responsivo para cadastrar painelistas, com:
 - Envio seguro via Supabase Edge Function para um webhook do n8n
 - Redirecionamento pós-sucesso
 
-> Projeto pensado para ser estático (HTML/CSS/JS) e usar apenas serviços gerenciados do Supabase.
+> Projeto pensado para ser estático (HTML/CSS/JS) e usar apenas serviços gerenciados do Supabase e do N8N.
 
 ---
 
@@ -17,7 +17,7 @@ Formulário web simples e responsivo para cadastrar painelistas, com:
   - `@supabase/supabase-js` (via CDN)
   - `imask` (via CDN)
 - Supabase
-  - Tabelas: `dpais`, `destado`, `genero`
+  - Tabelas: `dpais`, `destado`, `genero`, `painelista`, `celulares`
   - Edge Function `cadastrar-painelista` (Deno)
   - RLS (Row Level Security) habilitado nas tabelas públicas de leitura
 - n8n (webhook externo para processar o cadastro)
@@ -38,6 +38,7 @@ supabase/
       deno.json
       index.ts
 ```
+<img width="582" height="906" alt="image" src="https://github.com/user-attachments/assets/a773d91d-8c47-43b8-9f72-7ed6c0883fef" />
 
 ---
 
@@ -68,7 +69,7 @@ Importante: em `supabase/config.toml`, `verify_jwt = true`, então a função ex
 
 ## Banco de dados esperado (Supabase)
 O front consome as tabelas abaixo, com colunas mínimas para funcionar:
-
+### Tabelas de referência (leitura pública)
 - `dpais`
   - `id_pais` (primary key)
   - `nome` (string)
@@ -83,7 +84,38 @@ O front consome as tabelas abaixo, com colunas mínimas para funcionar:
   - `id_genero` (primary key)
   - `escolha_genero` (string)
 
-Políticas RLS recomendadas (leitura pública): permitir `select` para a role `anon` nessas tabelas (apenas leitura). Não exponha dados sensíveis.
+Políticas RLS recomendadas (leitura pública): permitir `select` para a role `anon` nessas tabelas (apenas leitura).
+
+### Tabelas de cadastro (escrita via Edge Function)
+
+- `painelista`
+  - `id_painel` (integer, primary key, auto-increment)
+  - `nome_completo` (varchar, required)
+  - `email` (varchar, required, unique)
+  - `data_nascimento` (date)
+  - `data_cadastro` (timestamp, default now())
+  - `id_estado` (integer, FK → `destado.id_estado`)
+  - `id_genero` (integer, FK → `genero.id_genero`)
+  - `cpf` (char, unique, nullable) (SERÁ USADO FUTURAMENTE)
+  - `id_pais` (integer, FK → `dpais.id_pais`)
+
+- `celulares`
+  - `id_celular` (integer, primary key, auto-increment)
+  - `id_painel` (integer, FK → `painelista.id_painel`, required)
+  - `numero` (text, required, unique)
+    - Validação: formato E.164 `^\+[1-9]\d{6,14}$`
+  - `is_ativo` (boolean, default true)
+  - `criado_em` (timestamp with time zone, default now())
+
+**Importante sobre RLS:**
+- As tabelas `painelista` e `celulares` **não devem** permitir `insert` direto do front-end (role `anon`).
+- O cadastro é feito via Edge Function → n8n, que deve usar uma `service_role` key ou credenciais adequadas para inserir dados.
+- Políticas RLS que **bloqueia** acesso anônimo de escrita nessas tabelas, permitindo apenas operações autenticadas/autorizadas.
+
+**Fluxo de cadastro:**
+1. Front-end envia dados para Edge Function `cadastrar-painelista`
+2. Edge Function repassa para webhook n8n
+3. n8n processa e insere em `painelista` e `celulares` usando credenciais com permissão de escrita
 
 ---
 
@@ -195,7 +227,7 @@ npx supabase functions deploy cadastrar-painelista --no-verify-jwt
    supabase secrets set N8N_WEBHOOK_URL="https://teste-n8n.ade4u1.easypanel.host/webhook/Cadastro-About-Brazil"
    supabase secrets set N8N_TEST_URL="https://teste-n8n.ade4u1.easypanel.host/webhook-test/Cadastro-About-Brazil"
    ```
-3. Use a `SUPABASE_URL` e `SUPABASE_ANON_KEY` do seu projeto no `script.js`.
+3. A `SUPABASE_URL` e `SUPABASE_ANON_KEY` do projeto no `script.js`.
 
 ---
 
@@ -223,6 +255,69 @@ npx supabase functions deploy cadastrar-painelista --no-verify-jwt
 
 ---
 
+## n8n (Back-end de Validação e Cadastro)
+
+O workflow do n8n atua como o "cérebro" do back-end. Ele é acionado **exclusivamente** pela Supabase Edge Function `cadastrar-painelista`, garantindo que a URL do webhook nunca seja exposta publicamente.
+
+A principal responsabilidade deste workflow é a **validação de regras de negócio** e a **prevenção de dados duplicados** antes de salvar no banco de dados.
+
+### Gatilho
+* **`Webhook`**: Recebe o `POST` da Edge Function. Os dados do formulário estão localizados em `body.body`, e o modo (teste/produção) em `body.mode`.
+
+### Fluxo de Validação e Sucesso
+O fluxo segue esta ordem:
+
+1.  **`Verificação país` (Supabase - Get a row)**
+    * Recebe o `id_pais` (ex: `76`) do formulário via Webhook.
+    * Busca na tabela `dpais` pela linha onde `id_pais` é igual ao valor recebido.
+    * Retorna o `codigo_iso2` (ex: "BR") para o próximo nó.
+
+2.  **`Validação` (Code)**
+    * Este é o "guarda-costas" principal. Ele recebe os dados do Webhook e do nó `Verificação país`.
+    * **Valida o Nome:** Checa se `nome_completo` bate com a regex `^[a-zA-Z\u00C0-\u017F ]+$`.
+    * **Valida o Email:** Checa se `email` bate com a regex `^[^\s@]+@[^\s@]+\.[^\s@]+$`.
+    * **Valida o Gênero:** Confirma que o `id_genero` recebido é um número válido (ex: 1, 2, ou 3).
+    * **Valida o Celular:**
+        * Usa o `codigo_iso2` (ex: "BR") para encontrar a regra de DDI e comprimento no mapa `regrasTelefone`.
+        * Verifica se o `celular` (ex: `+5585999017780`) começa com o DDI correto (`+55`).
+        * Verifica se o `celular` tem o comprimento total exato (ex: `13`).
+    * Se qualquer validação falhar, o nó joga um `Error`, que interrompe o fluxo e é capturado pelo `Error Trigger`.
+
+3.  **`Procurar Email Existente` (Supabase - getAll)**
+    * Verifica na tabela `painelista` se o `email` recebido já existe.
+
+4.  **`If` (Verificação de Email)**
+    * **Se `true` (Email encontrado):** O fluxo é desviado para o nó `Email Existente`.
+    * **Se `false` (Email novo):** O fluxo continua.
+
+5.  **`Procurar Numero Existente` (Supabase - get)**
+    * Verifica na tabela `celulares` se o `numero` de celular recebido já existe.
+
+6.  **`Verificar Erro de Numero Duplicado` (If)**
+    * **Se `true` (Celular encontrado):** O fluxo é desviado para o nó `Numero de Celular Existente`.
+    * **Se `false` (Celular novo):** O fluxo continua para o cadastro.
+
+7.  **`Cadastro Painelista` (Supabase - create)**
+    * Insere o novo usuário na tabela `painelista` com os dados validados.
+    * Retorna o `id_painel` do usuário recém-criado.
+
+8.  **`Cadastro Numero de Celular` (Supabase - create)**
+    * Usa o `id_painel` do nó anterior para inserir o `numero` de celular na tabela `celulares`, ligando-o ao novo painelista.
+
+9.  **`Cadastro Concluído` (Respond to Webhook)**
+    * Retorna uma mensagem de `status: "sucesso"` e um código 200 para a Edge Function, que repassa ao formulário.
+
+### Fluxo de Erros (Tratamento)
+O workflow é configurado com um `Error Trigger` (gatilho de erro) para lidar com falhas:
+
+* **Validação (Nó `Code`):** Se qualquer regra de negócio falhar (nome, email, gênero, celular), o nó `Code` dispara um `throw new Error(...)`.
+* **Duplicidade (Nós `If`):** Se o email ou celular já existirem, o fluxo é desviado para os nós `Email Existente` ou `Numero de Celular Existente`.
+* **Resposta de Erro:** Em qualquer caso de erro, um nó `Respond to Webhook` é acionado para retornar um **status 4xx** (ex: 400 para validação, 409 para duplicidade) e a mensagem de erro específica (ex: `"Telefone inválido"`). A Edge Function repassa essa mensagem de erro diretamente para o `feedback` no formulário.
+
+<img width="1553" height="366" alt="image" src="https://github.com/user-attachments/assets/9c108f32-bd06-4d42-ae54-392baf033d69" />
+
+
+---
 ## Troubleshooting
 - 401/403 na Edge Function: confirme `verify_jwt = true` e que o header `Authorization` contém um JWT válido (use a `anon key`).
 - CORS: a função já envia os headers CORS necessários; se servir o front de outro domínio, mantenha `Access-Control-Allow-Origin: *` (ou restrinja conforme o seu domínio).
