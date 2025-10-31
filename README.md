@@ -38,7 +38,7 @@ supabase/
       deno.json
       index.ts
 ```
-<img width="582" height="906" alt="image" src="https://github.com/user-attachments/assets/a773d91d-8c47-43b8-9f72-7ed6c0883fef" />
+<img width="581" height="907" alt="image" src="https://github.com/user-attachments/assets/47e9781f-9fe9-4280-a899-3474edbc0960" />
 
 ---
 
@@ -67,7 +67,7 @@ Importante: em `supabase/config.toml`, `verify_jwt = true`, então a função ex
 
 ---
 
-## Banco de dados esperado (Supabase)
+## Banco de dados  (Supabase)
 O front consome as tabelas abaixo, com colunas mínimas para funcionar:
 ### Tabelas de referência (leitura pública)
 - `dpais`
@@ -122,8 +122,8 @@ Políticas RLS recomendadas (leitura pública): permitir `select` para a role `a
 ## Configuração
 ### 1) Supabase (projeto e tabelas)
 1. Crie um projeto no Supabase.
-2. Crie as tabelas `dpais`, `destado`, `genero` conforme acima.
-3. Ajuste RLS para permitir `select` ao `anon` nessas tabelas, se desejar consumo direto do front.
+2. Crie as tabelas `dpais`, `destado`, `genero`, `painelista`, `celulares`  conforme acima.
+3. Ajuste RLS para permitir `select` ao `anon` nas tabelas, `dpais`, `destado`, `genero`  se desejar consumo direto do front.
 
 ### 2) Variáveis no front (`script.js`)
 No topo de `script.js`, ajuste:
