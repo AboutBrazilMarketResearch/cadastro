@@ -36,7 +36,8 @@ const translations = {
         'feedbackErroSupabase': 'Erro no cadastro:',
         'feedbackErroRede': 'Erro de rede. Verifique o console (F12).',
         'feedbackErroNome': 'Erro: O nome deve conter apenas letras e espaços.',
-        'feedbackErroCelularInvalido': 'Erro: Por favor, preencha o número de celular completo.'
+        'feedbackErroCelularInvalido': 'Erro: Por favor, preencha o número de celular completo.',
+        'feedbackErroEmailInvalido': 'Erro: Por favor, insira um formato de email válido.'
     },
     'es': {
         'pageTitle': 'Formulario de Registro',
@@ -60,7 +61,8 @@ const translations = {
         'feedbackErroSupabase': 'Error en el registro:',
         'feedbackErroRede': 'Error de red. Verifique la consola (F12).',
         'feedbackErroNome': 'Error: El nombre debe contener solo letras y espacios.',
-        'feedbackErroCelularInvalido': 'Error: Por favor, complete el número de celular.'
+        'feedbackErroCelularInvalido': 'Error: Por favor, complete el número de celular.',
+        'feedbackErroEmailInvalido': 'Error: Por favor, ingrese un formato de correo electrónico válido.'
     }
 };
 
@@ -247,7 +249,21 @@ form.addEventListener('submit', async (event) => {
         feedback.className = 'error';
         return; 
     }
+
+    // --- VALIDAÇÃO DE  EMAIL ▼▼ ---
+    const email = document.getElementById('email').value;
     
+    // Esta Regex checa por um formato "algo@algo.algo" (não permite espaços)
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!regexEmail.test(email)) {
+        // Se o formato NÃO for válido...
+        feedback.textContent = dict.feedbackErroEmailInvalido;
+        feedback.className = 'error';
+        return; // Impede o envio
+    }
+
+    // --- VALIDAÇÃO DE CELULAR PAÍS ▼▼ ---
     // Pega o 'iso2' do país que o usuário selecionou
     const paisIso2 = paisSelect.options[paisSelect.selectedIndex].dataset.iso2;
     // Pega o comprimento esperado do 'lengthMap'
