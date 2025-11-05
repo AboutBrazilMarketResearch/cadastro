@@ -9,7 +9,7 @@ const URL_REDIRECIONAMENTO = "https://conectatribo.com.br/t/lOlVjW";
 
 // Coloque 'true' para enviar ao  n8n de teste.
 // Coloque 'false' para enviar ao n8n de produção.
-const MODO_DE_TESTE = false; 
+const MODO_DE_TESTE = true; 
 
 
 // --- DICIONÁRIO DE TRADUÇÃO (i18n) ---
