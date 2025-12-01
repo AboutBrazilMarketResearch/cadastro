@@ -1,10 +1,7 @@
 
 // URL e Chave ANON Supabase 
-const SUPABASE_URL = "https://byutodfuespjqjoxkemz.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5dXRvZGZ1ZXNwanFqb3hrZW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyOTA0ODIsImV4cCI6MjA3Nzg2NjQ4Mn0.42Gp04PBXuuymIlveCAWL0w4sVKp5gnJjYs-rfme3bo";
-
-// URL para onde o usuário será enviado após o sucesso
-const URL_REDIRECIONAMENTO = "https://conectatribo.com.br/t/lOlVjW";
+const SUPABASE_URL = "https://mlhdtsjdhmmaiveltojv.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1saGR0c2pkaG1tYWl2ZWx0b2p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MTI5NzMsImV4cCI6MjA3NTA4ODk3M30.ruk8TVAvqwIs-bHCgcbw2S2q_wLtRG3dP9DEEDEQVkM";
 
 
 // Coloque 'true' para enviar ao  n8n de teste.
@@ -337,10 +334,6 @@ form.addEventListener('submit', async (event) => {
   if (phoneMask) phoneMask.destroy();
   celularInput.placeholder = dict.optSelecionePais;
   celularInput.disabled = true;
-
-  setTimeout(() => {
-    window.location.href = URL_REDIRECIONAMENTO;
-  }, 2000);
 
 }   catch (error) {
     console.error("❌ Erro geral:", error);
