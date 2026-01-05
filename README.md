@@ -130,8 +130,6 @@ No topo de `script.js`, ajuste:
 - `URL_REDIRECIONAMENTO` — [para onde enviar o usuário após sucesso](https://conectatribo.com.br/t/lOlVjW)
 - `MODO_DE_TESTE` — `true` para usar `N8N_TEST_URL`, `false` para `N8N_WEBHOOK_URL`
 
-Observação de segurança: a `anon key` é pública por natureza. Garanta que RLS está correto e que apenas as operações necessárias estão expostas ao anônimo.
-
 ### 3) Variáveis na Edge Function
 Variáveis no Supabase para a função `cadastrar-painelista`:
 - `N8N_WEBHOOK_URL` — webhook de produção do n8n
