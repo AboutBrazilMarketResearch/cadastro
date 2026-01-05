@@ -127,8 +127,6 @@ Políticas RLS recomendadas (leitura pública): permitir `select` para a role `a
 
 ### 2) Variáveis no front (`script.js`)
 No topo de `script.js`, ajuste:
-- `SUPABASE_URL` — https://mlhdtsjdhmmaiveltojv.supabase.co
-- `SUPABASE_ANON_KEY` — eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1saGR0c2pkaG1tYWl2ZWx0b2p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MTI5NzMsImV4cCI6MjA3NTA4ODk3M30.ruk8TVAvqwIs-bHCgcbw2S2q_wLtRG3dP9DEEDEQVkM
 - `URL_REDIRECIONAMENTO` — [para onde enviar o usuário após sucesso](https://conectatribo.com.br/t/lOlVjW)
 - `MODO_DE_TESTE` — `true` para usar `N8N_TEST_URL`, `false` para `N8N_WEBHOOK_URL`
 
