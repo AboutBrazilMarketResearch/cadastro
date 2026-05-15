@@ -67,7 +67,7 @@ const translations = {
 // 2. MÁSCARAS
 // ---------------------------------------------------------------
 const maskMap = {
-    'AR': { mask: '+54 9 0000 00-0000', placeholder: '+54 9 XXX XXX-XXXX' },
+    'AR': { mask: ['+54 9 00 0000-0000', '+54 9 000 000-0000'], placeholder: '+54 9 XXX XXX XXXX'},
     'BO': { mask: '+591 0 000-0000', placeholder: '+591 X XXX-XXXX' },
     'BR': { mask: '+55 (00) 00000-0000', placeholder: '+55 (DD) 9____-____' },
     'CL': { mask: '+56 0 0000 0000', placeholder: '+56 X XXXX XXXX' },
@@ -99,7 +99,7 @@ const maskMap = {
 const lengthMap = {
 
     // Argentina aceita tamanho variável
-    'AR': { min: 11, max: 13 },
+    'AR': { min: 12, max: 13 },
 
     // Países fixos
     'BO': 8,
