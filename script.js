@@ -99,7 +99,7 @@ const maskMap = {
 const lengthMap = {
 
     // Argentina aceita tamanho variável
-    'AR': 13,
+    'AR': 12,
     // Países fixos
     'BO': 8,
     'BR': 11,
